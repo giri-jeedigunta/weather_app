@@ -36,10 +36,10 @@ class _WeatherViewState extends State<WeatherView> {
     super.initState();
 
     updateWeather(widget.todaysWeather, widget.fiveDayWeatherForecast);
-    print('Time : $formattedTime');
   }
 
   void formatFiveDayForecast(data) {
+    todayTimeSlots = [];
     for (var i = 0; i < data.length; i++) {
       var dateText = data[i]['dt_txt'].split(' ');
       String dateKey = dateText[0];
@@ -59,7 +59,10 @@ class _WeatherViewState extends State<WeatherView> {
       // Five Day Forecast Data:
       (fiveDaysForecastFormatted.containsKey(dateKey))
           ? fiveDaysForecastFormatted.update(dateKey, (value) => value + minMax)
-          : (){fiveDaysForecastFormatted.putIfAbsent(dateKey, () => minMax); fiveDayForecastWeatherCondition.add(condition);}();
+          : () {
+              fiveDaysForecastFormatted.putIfAbsent(dateKey, () => minMax);
+              fiveDayForecastWeatherCondition.add(condition);
+            }();
     }
 
     // Five Day Forecast Data:
@@ -69,20 +72,22 @@ class _WeatherViewState extends State<WeatherView> {
   }
 
   void updateWeather(dynamic data, dynamic fiveDayWeatherForecast) {
-    int condition = data['weather'][0]['id'];
+    setState(() {
+      int condition = data['weather'][0]['id'];
 
-    city = data['name'];
-    country = data['sys']['country'];
-    description = data['weather'][0]['description'];
+      city = data['name'];
+      country = data['sys']['country'];
+      description = data['weather'][0]['description'];
 
-    //Today:
-    currentTemprature = (data['main']['temp']).toInt();
-    iconName = weather.getWeatherIcon(condition);
-    todayLow = (data['main']['temp_min']).toInt();
-    todayHigh = (data['main']['temp_max']).toInt();
+      //Today:
+      currentTemprature = (data['main']['temp']).toInt();
+      iconName = weather.getWeatherIcon(condition);
+      todayLow = (data['main']['temp_min']).toInt();
+      todayHigh = (data['main']['temp_max']).toInt();
 
-    // Five day forecast:
-    formatFiveDayForecast(fiveDayWeatherForecast['list']);
+      // Five day forecast:
+      formatFiveDayForecast(fiveDayWeatherForecast['list']);
+    });
   }
 
   @override
@@ -108,7 +113,9 @@ class _WeatherViewState extends State<WeatherView> {
                       height: 26.0,
                     ),
                     Text(
-                      '$formattedDate - $formattedTime'.toString().toUpperCase(),
+                      '$formattedDate - $formattedTime'
+                          .toString()
+                          .toUpperCase(),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Lora',
@@ -122,6 +129,9 @@ class _WeatherViewState extends State<WeatherView> {
                       padding: const EdgeInsets.symmetric(horizontal: 45.0),
                       child: Text(
                         '$city, $country'.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Lora',
@@ -215,14 +225,18 @@ class _WeatherViewState extends State<WeatherView> {
                         children: List.generate(
                           todayTimeSlots.length,
                           (index) {
-                            return TodaysForecast(
-                              timeStamp: todayTimeSlots[index],
-                              temprature:
-                                  fiveDayForecastTempratures[0][index].toInt(),
-                              endOfList: index == todayTimeSlots.length - 1
-                                  ? Color(0xff6ABDCB)
-                                  : Colors.white24,
-                            );
+                            return index < 7
+                                ? TodaysForecast(
+                                    timeStamp: todayTimeSlots[index],
+                                    temprature: fiveDayForecastTempratures[0]
+                                            [index]
+                                        .toInt(),
+                                    endOfList: index > 5 ||
+                                            index == todayTimeSlots.length - 1
+                                        ? Color(0xff6ABDCB)
+                                        : Colors.white24,
+                                  )
+                                : SizedBox(width: 0, height: 0);
                           },
                         ),
                       ),
@@ -289,10 +303,20 @@ class _WeatherViewState extends State<WeatherView> {
                         ),
                         borderRadius: BorderRadius.all(Radius.circular(40.0)),
                       ),
-                      child: Icon(
-                        Icons.near_me,
-                        color: Colors.black87,
-                        size: 24.0,
+                      child: RawMaterialButton(
+                        onPressed: () async {
+                          var todaysWeather =
+                              await weather.getLocationWeather();
+                          var fiveDayWeatherForecast =
+                              await weather.getLocationForecast();
+
+                          updateWeather(todaysWeather, fiveDayWeatherForecast);
+                        },
+                        child: Icon(
+                          Icons.near_me,
+                          color: Colors.black87,
+                          size: 24.0,
+                        ),
                       ),
                     ),
                   ],

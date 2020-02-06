@@ -8,14 +8,18 @@ class LoadingView extends StatefulWidget {
 }
 
 class _LoadingViewState extends State<LoadingView> {
+  WeatherHelper weather = WeatherHelper();
+
   void getWeather() async {
-    var todaysWeather = await WeatherHelper().getLocationWeather();
-    var fiveDayWeatherForecast = await WeatherHelper().getLocationForecast();
+    var todaysWeather = await weather.getLocationWeather();
+    var fiveDayWeatherForecast = await weather.getLocationForecast();
 
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) {
-        return WeatherView(todaysWeather: todaysWeather, fiveDayWeatherForecast: fiveDayWeatherForecast);
+        return WeatherView(
+            todaysWeather: todaysWeather,
+            fiveDayWeatherForecast: fiveDayWeatherForecast);
       }),
     );
   }

@@ -11,7 +11,7 @@ class WeatherHelper {
 
     // GET weather info of the location:
     ApiHelper apiHelper = ApiHelper(
-        '$kWeatherApiUrl?lat=${location.latitude}&lon=${location.latitude}&appid=$kWeatherAppId&units=metric');
+        '$kWeatherApiUrl?lat=${location.latitude}&lon=${location.longitude}&appid=$kWeatherAppId&units=metric');
 
     // Using var as the data is dynamic:
     var weatherData = await apiHelper.getResponse();
@@ -28,7 +28,7 @@ class WeatherHelper {
 
     // GET weather info of the location:
     ApiHelper apiHelper = ApiHelper(
-        '$kForecastApiUrl?lat=${location.latitude}&lon=${location.latitude}&appid=$kWeatherAppId&units=metric');
+        '$kForecastApiUrl?lat=${location.latitude}&lon=${location.longitude}&appid=$kWeatherAppId&units=metric');
 
     // Using var as the data is dynamic:
     var forecastData = await apiHelper.getResponse();
