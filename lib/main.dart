@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:weather_app/views/loader_widget.dart';
+import 'package:weather_app/views/spalsh_screen.dart';
 
 void main() => runApp(WeatherApp());
 

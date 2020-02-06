@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:weather_app/utils/weather_helper.dart';
-import 'package:weather_app/views/weather_widget.dart';
+import 'package:weather_app/views/weather.dart';
 
 class LoadingView extends StatefulWidget {
   @override
@@ -9,12 +9,13 @@ class LoadingView extends StatefulWidget {
 
 class _LoadingViewState extends State<LoadingView> {
   void getWeather() async {
-    var weatherData = await WeatherHelper().getLocationWeather();
+    var todaysWeather = await WeatherHelper().getLocationWeather();
+    var fiveDayWeatherForecast = await WeatherHelper().getLocationForecast();
 
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) {
-        return WeatherView(weatherInfo: weatherData);
+        return WeatherView(todaysWeather: todaysWeather, fiveDayWeatherForecast: fiveDayWeatherForecast);
       }),
     );
   }

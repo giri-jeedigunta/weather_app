@@ -21,6 +21,23 @@ class WeatherHelper {
     
   }
 
+  Future<dynamic> getLocationForecast() async {
+    // Get current Location
+    Location location = Location();
+    await location.getCurrentLocation();
+
+    // GET weather info of the location:
+    ApiHelper apiHelper = ApiHelper(
+        '$kForecastApiUrl?lat=${location.latitude}&lon=${location.latitude}&appid=$kWeatherAppId&units=metric');
+
+    // Using var as the data is dynamic:
+    var forecastData = await apiHelper.getResponse();
+    print('Forecast Data >> $forecastData');
+    
+    return forecastData;
+    
+  }  
+
   getWeatherIcon(int condition) {
     if (condition < 300) {
       return WeatherIcons.thunderstorm;
