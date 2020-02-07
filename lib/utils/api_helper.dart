@@ -8,6 +8,8 @@ class ApiHelper {
 
   Future getResponse() async {
     http.Response response = await http.get(url);
-    return response.statusCode == 200 ? jsonDecode(response.body) : response.statusCode;
+    return response.statusCode == 200
+        ? jsonDecode(response.body)
+        : response.statusCode;
   }
 }

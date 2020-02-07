@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_app/utils/weather_helper.dart';
 import 'package:weather_icons/weather_icons.dart';
 import 'package:weather_app/components/todays_forecast.dart';
 import 'package:weather_app/components/week_day_forecast.dart';
+import 'package:provider/provider.dart';
+import 'package:weather_app/weather_store.dart';
 
 class WeatherView extends StatefulWidget {
   WeatherView({this.todaysWeather, this.fiveDayWeatherForecast});
@@ -19,16 +22,14 @@ class _WeatherViewState extends State<WeatherView> {
   final formattedDate = new DateFormat.yMMMd().format(new DateTime.now());
   final formattedTime = new DateFormat.jm().format(new DateTime.now());
 
-  int currentTemprature, todayLow, todayHigh;
-  List todayTimeSlots = [];
+  Map updatedTodaysWeather;
 
-  String city, country, description;
+  List todayTimeSlots = [];
 
   List fiveDayForecastDates,
       fiveDayForecastTempratures,
       fiveDayForecastWeatherCondition = [];
 
-  IconData iconName;
   Map<String, dynamic> fiveDaysForecastFormatted = {};
 
   @override
@@ -71,19 +72,9 @@ class _WeatherViewState extends State<WeatherView> {
     fiveDayForecastWeatherCondition.toList();
   }
 
-  void updateWeather(dynamic data, dynamic fiveDayWeatherForecast) {
+  void updateWeather(dynamic todaysWeather, dynamic fiveDayWeatherForecast) {
     setState(() {
-      int condition = data['weather'][0]['id'];
-
-      city = data['name'];
-      country = data['sys']['country'];
-      description = data['weather'][0]['description'];
-
-      //Today:
-      currentTemprature = (data['main']['temp']).toInt();
-      iconName = weather.getWeatherIcon(condition);
-      todayLow = (data['main']['temp_min']).toInt();
-      todayHigh = (data['main']['temp_max']).toInt();
+      updatedTodaysWeather = todaysWeather;
 
       // Five day forecast:
       formatFiveDayForecast(fiveDayWeatherForecast['list']);
@@ -91,246 +82,260 @@ class _WeatherViewState extends State<WeatherView> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: Color(0xff6ABDCB),
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              flex: 8,
-              child: Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    SizedBox(
-                      height: 28.0,
-                    ),
-                    Icon(
-                      iconName,
+  Widget build(BuildContext context) {
+    final weatherStore = Provider.of<WeatherStore>(context);
+    return Scaffold(
+      backgroundColor: Color(0xff6ABDCB),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            flex: 8,
+            child: Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(
+                    height: 28.0,
+                  ),
+                  Icon(
+                    updatedTodaysWeather['weatherIcon'],
+                    color: Colors.white,
+                    size: 40.0,
+                  ),
+                  SizedBox(
+                    height: 26.0,
+                  ),
+                  Text(
+                    '$formattedDate - $formattedTime'.toString().toUpperCase(),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Lora',
+                      fontSize: 12.0,
                       color: Colors.white,
-                      size: 40.0,
+                      letterSpacing: 1.25,
+                      fontWeight: FontWeight.bold,
                     ),
-                    SizedBox(
-                      height: 26.0,
-                    ),
-                    Text(
-                      '$formattedDate - $formattedTime'
-                          .toString()
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 45.0),
+                    child: Text(
+                      (updatedTodaysWeather['city'] +
+                              ', ' +
+                              updatedTodaysWeather['country'])
                           .toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Lora',
-                        fontSize: 12.0,
+                        fontSize: 28.0,
+                        color: Colors.white,
+                        letterSpacing: 1.25,
+                        fontWeight: FontWeight.bold,
+                        shadows: [
+                          Shadow(
+                              // bottomLeft
+                              offset: Offset(1.25, 1.25),
+                              color: Colors.black12,
+                              blurRadius: 5.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16.0),
+                        child: Text(
+                          updatedTodaysWeather['now'].toString(),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Gelasio',
+                            fontSize: 96.0,
+                            color: Colors.white,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                            shadows: [
+                              Shadow(
+                                  // bottomLeft
+                                  offset: Offset(1.25, 1.25),
+                                  color: Colors.black26,
+                                  blurRadius: 5.0),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        WeatherIcons.celsius,
+                        color: Colors.white,
+                        size: 25.0,
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 18.0),
+                    child: Text(
+                      toBeginningOfSentenceCase(
+                          updatedTodaysWeather['description']),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Lora',
+                        fontSize: 14.0,
                         color: Colors.white,
                         letterSpacing: 1.25,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 45.0),
-                      child: Text(
-                        '$city, $country'.toUpperCase(),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: false,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Lora',
-                          fontSize: 28.0,
-                          color: Colors.white,
-                          letterSpacing: 1.25,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(
-                                // bottomLeft
-                                offset: Offset(1.25, 1.25),
-                                color: Colors.black12,
-                                blurRadius: 5.0),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(left: 16.0),
-                          child: Text(
-                            '$currentTemprature',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: 'Gelasio',
-                              fontSize: 96.0,
-                              color: Colors.white,
-                              letterSpacing: 0,
-                              fontWeight: FontWeight.w600,
-                              shadows: [
-                                Shadow(
-                                    // bottomLeft
-                                    offset: Offset(1.25, 1.25),
-                                    color: Colors.black26,
-                                    blurRadius: 5.0),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Icon(
-                          WeatherIcons.celsius,
-                          color: Colors.white,
-                          size: 25.0,
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 18.0),
-                      child: Text(
-                        toBeginningOfSentenceCase('$description'),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Lora',
-                          fontSize: 14.0,
-                          color: Colors.white,
-                          letterSpacing: 1.25,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20.0,
-                      width: 250.0,
-                      child: Divider(
-                        color: Colors.teal.shade100,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 0.0),
-                      child: Text(
-                        'Low: $todayLow  |  High: $todayHigh°C',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Lora',
-                          fontSize: 12.0,
-                          color: Colors.white,
-                          letterSpacing: 1.35,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 30.0,
-                    ),
-                    Padding(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          todayTimeSlots.length,
-                          (index) {
-                            return index < 7
-                                ? TodaysForecast(
-                                    timeStamp: todayTimeSlots[index],
-                                    temprature: fiveDayForecastTempratures[0]
-                                            [index]
-                                        .toInt(),
-                                    endOfList: index > 5 ||
-                                            index == todayTimeSlots.length - 1
-                                        ? Color(0xff6ABDCB)
-                                        : Colors.white24,
-                                  )
-                                : SizedBox(width: 0, height: 0);
-                          },
-                        ),
-                      ),
-                      padding: const EdgeInsets.all(0.0),
-                    ),
-                  ],
-                ),
-                color: Color(0xff6ABDCB),
-                width: double.infinity,
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Container(
-                margin: EdgeInsets.only(top: 0),
-                width: double.infinity,
-                color: Colors.white,
-                child: Container(
-                  width: double.infinity,
-                  height: 45.0,
-                  decoration: BoxDecoration(
-                    color: Color(0xff6ABDCB),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(45),
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                    width: 250.0,
+                    child: Divider(
+                      color: Colors.teal.shade100,
                     ),
                   ),
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 7,
-              child: Container(
-                child: Column(
-                  children: <Widget>[
-                    SizedBox(
-                      height: 28.0,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 0.0),
+                    child: Text(
+                      'Low: ' +
+                          updatedTodaysWeather['low'].toString() +
+                          '°C |  High: ' +
+                          updatedTodaysWeather['high'].toString() +
+                          '°C',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Lora',
+                        fontSize: 12.0,
+                        color: Colors.white,
+                        letterSpacing: 1.35,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    Column(
+                  ),
+                  SizedBox(
+                    height: 30.0,
+                  ),
+                  Padding(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
-                        fiveDayForecastDates.length,
+                        todayTimeSlots.length,
                         (index) {
-                          return index != 0
-                              ? WeekDayForecast(
-                                  weekDayName: DateFormat('EEEE').format(
-                                      DateTime.parse(fiveDayForecastDates[index]
-                                          .toString())),
-                                  weekTempratureDayLowHigh:
-                                      fiveDayForecastTempratures[index]..sort(),
-                                  weatherConditionIcon: weather.getWeatherIcon(
-                                      fiveDayForecastWeatherCondition[index]),
+                          return index < 7
+                              ? TodaysForecast(
+                                  timeStamp: todayTimeSlots[index],
+                                  temprature: fiveDayForecastTempratures[0]
+                                          [index]
+                                      .toInt(),
+                                  endOfList: index > 5 ||
+                                          index == todayTimeSlots.length - 1
+                                      ? Color(0xff6ABDCB)
+                                      : Colors.white24,
                                 )
                               : SizedBox(width: 0, height: 0);
                         },
                       ),
                     ),
-                    Container(
-                      width: 40.0,
-                      height: 40.0,
-                      margin: EdgeInsets.symmetric(vertical: 10.0),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 1,
-                          color: Colors.black26,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(40.0)),
+                    padding: const EdgeInsets.all(0.0),
+                  ),
+                ],
+              ),
+              color: Color(0xff6ABDCB),
+              width: double.infinity,
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              margin: EdgeInsets.only(top: 0),
+              width: double.infinity,
+              color: Colors.white,
+              child: Container(
+                width: double.infinity,
+                height: 45.0,
+                decoration: BoxDecoration(
+                  color: Color(0xff6ABDCB),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(45),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 7,
+            child: Container(
+              child: Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: 28.0,
+                  ),
+                  Column(
+                    children: List.generate(
+                      fiveDayForecastDates.length,
+                      (index) {
+                        return index != 0
+                            ? WeekDayForecast(
+                                weekDayName: DateFormat('EEEE').format(
+                                    DateTime.parse(fiveDayForecastDates[index]
+                                        .toString())),
+                                weekTempratureDayLowHigh:
+                                    fiveDayForecastTempratures[index]..sort(),
+                                weatherConditionIcon: weather.getWeatherIcon(
+                                    fiveDayForecastWeatherCondition[index]),
+                              )
+                            : SizedBox(width: 0, height: 0);
+                      },
+                    ),
+                  ),
+                  Container(
+                    width: 40.0,
+                    height: 40.0,
+                    margin: EdgeInsets.symmetric(vertical: 10.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 1,
+                        color: Colors.black26,
                       ),
-                      child: RawMaterialButton(
+                      borderRadius: BorderRadius.all(Radius.circular(40.0)),
+                    ),
+                    child: Observer(
+                      builder: (_) => RawMaterialButton(
                         onPressed: () async {
+                          weatherStore.updateCoordinates();
+
                           var todaysWeather =
-                              await weather.getLocationWeather();
+                              await weather.getLocationWeather(weatherStore.latitude, weatherStore.longitude);
                           var fiveDayWeatherForecast =
-                              await weather.getLocationForecast();
+                              await weather.getFiveDayForecast(weatherStore.latitude, weatherStore.longitude);
 
                           updateWeather(todaysWeather, fiveDayWeatherForecast);
+                          
                         },
                         child: Icon(
-                          Icons.near_me,
+                          Icons.refresh,
                           color: Colors.black87,
                           size: 24.0,
                         ),
                       ),
                     ),
-                  ],
-                ),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(45),
                   ),
+                ],
+              ),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(45),
                 ),
               ),
             ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
+  }
 }

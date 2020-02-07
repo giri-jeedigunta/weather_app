@@ -1,42 +1,44 @@
 import 'package:weather_app/utils/constants.dart';
 import 'package:weather_app/utils/api_helper.dart';
-import 'package:weather_app/utils/loaction_helper.dart';
 import 'package:weather_icons/weather_icons.dart';
 
 class WeatherHelper {
-  Future<dynamic> getLocationWeather() async {
-    // Get current Location
-    Location location = Location();
-    await location.getCurrentLocation();
+  Map<dynamic, dynamic> todaysWeatherJSON = {};
+  Future<dynamic> getLocationWeather(lat, long) async {
 
-    // GET weather info of the location:
     ApiHelper apiHelper = ApiHelper(
-        '$kWeatherApiUrl?lat=${location.latitude}&lon=${location.longitude}&appid=$kWeatherAppId&units=metric');
+        '$kWeatherApiUrl?lat=$lat&lon=$long&appid=$kWeatherAppId&units=metric');
 
     // Using var as the data is dynamic:
     var weatherData = await apiHelper.getResponse();
-    print('weather Data >> $weatherData');
-    
-    return weatherData;
-    
+    formatTodaysWeather(weatherData);
+
+    return todaysWeatherJSON;
   }
 
-  Future<dynamic> getLocationForecast() async {
-    // Get current Location
-    Location location = Location();
-    await location.getCurrentLocation();
-
+  Future<dynamic> getFiveDayForecast(lat, long) async {
     // GET weather info of the location:
     ApiHelper apiHelper = ApiHelper(
-        '$kForecastApiUrl?lat=${location.latitude}&lon=${location.longitude}&appid=$kWeatherAppId&units=metric');
+        '$kForecastApiUrl?lat=$lat&lon=$long&appid=$kWeatherAppId&units=metric');
 
     // Using var as the data is dynamic:
     var forecastData = await apiHelper.getResponse();
-    print('Forecast Data >> $forecastData');
-    
+
     return forecastData;
-    
-  }  
+  }
+
+  void formatTodaysWeather(todaysWeatherInfo) {
+    todaysWeatherJSON = {
+      'now': todaysWeatherInfo['main']['temp'].toInt(),
+      'low': todaysWeatherInfo['main']['temp_min'].toInt(),
+      'high': todaysWeatherInfo['main']['temp_max'].toInt(),
+      'description': todaysWeatherInfo['weather'][0]['description'],
+      'city': todaysWeatherInfo['name'],
+      'country': todaysWeatherInfo['sys']['country'],
+      'condition': todaysWeatherInfo['weather'][0]['id'].toInt(),
+      'weatherIcon': getWeatherIcon(todaysWeatherInfo['weather'][0]['id'])
+    };
+  }
 
   getWeatherIcon(int condition) {
     if (condition < 300) {
@@ -56,5 +58,5 @@ class WeatherHelper {
     } else {
       return WeatherIcons.cloud_refresh;
     }
-  }  
+  }
 }
