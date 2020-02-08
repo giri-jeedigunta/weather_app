@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:weather_app/utils/weather_helper.dart';
+import 'package:weather_app/services/weather_helper.dart';
 import 'package:weather_app/views/weather.dart';
 import 'package:weather_app/weather_store.dart';
 
@@ -10,25 +10,24 @@ class LoadingView extends StatefulWidget {
 }
 
 class _LoadingViewState extends State<LoadingView> {
-  WeatherHelper weather = WeatherHelper();
+  WeatherService weather = WeatherService();
   WeatherStore weatherStore;
 
   void getWeather() async {
     await weatherStore.updateCoordinates();
 
-    var todaysWeather = await weather.getLocationWeather(
+    final todaysWeather = await weather.getLocationWeather(
         weatherStore.latitude, weatherStore.longitude);
-    var fiveDayWeatherForecast = await weather.getFiveDayForecast(
+    final fiveDayWeatherForecast = await weather.getFiveDayForecast(
         weatherStore.latitude, weatherStore.longitude);
 
-    Navigator.push(
+    await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) {
-        return WeatherView(
-          todaysWeather: todaysWeather,
-          fiveDayWeatherForecast: fiveDayWeatherForecast,
-        );
-      }),
+      MaterialPageRoute(
+          builder: (context) => WeatherView(
+                todaysWeather: todaysWeather,
+                fiveDayWeatherForecast: fiveDayWeatherForecast,
+              )),
     );
   }
 
@@ -36,9 +35,7 @@ class _LoadingViewState extends State<LoadingView> {
   void initState() {
     super.initState();
 
-    print('context .... ${this.context}');
-    weatherStore = Provider.of<WeatherStore>(this.context, listen:false);
-
+    weatherStore = Provider.of<WeatherStore>(this.context, listen: false);
     getWeather();
   }
 
