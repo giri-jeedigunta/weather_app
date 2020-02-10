@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 
 class WeekDayForecast extends StatelessWidget {
-  WeekDayForecast(
-      {this.weekDayName,
-      this.weekTempratureDayLowHigh,
-      this.weatherConditionIcon});
+  WeekDayForecast({
+    this.weekDayName,
+    this.weekTempratureDayLowHigh,
+    this.weatherConditionIcon,
+    this.weekDayCount,
+  });
 
   final String weekDayName;
   final List weekTempratureDayLowHigh;
   final IconData weatherConditionIcon;
+  final int weekDayCount;
 
   @override
   Widget build(BuildContext context) => Container(
         width: double.infinity,
         padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
-        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 11.5),
+        margin: EdgeInsets.fromLTRB(20, weekDayCount < 2 ? 0 : 11, 20, 11),
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(width: 1, color: Colors.black12),
