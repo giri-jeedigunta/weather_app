@@ -13,6 +13,7 @@ class _LoadingViewState extends State<LoadingView> {
   WeatherService weather = WeatherService();
   WeatherStore weatherStore;
 
+  // ignore: avoid_void_async
   void getWeather() async {
     await weatherStore.updateCoordinates();
 
@@ -35,7 +36,7 @@ class _LoadingViewState extends State<LoadingView> {
   void initState() {
     super.initState();
 
-    weatherStore = Provider.of<WeatherStore>(this.context, listen: false);
+    weatherStore = Provider.of<WeatherStore>(context, listen: false);
     getWeather();
   }
 

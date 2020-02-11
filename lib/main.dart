@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:weather_app/views/spalsh_screen.dart';
+import 'package:weather_app/views/splash_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:weather_app/weather_store.dart';
 

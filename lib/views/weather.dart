@@ -7,9 +7,12 @@ import 'package:weather_app/components/todays_forecast.dart';
 import 'package:weather_app/components/week_day_forecast.dart';
 import 'package:provider/provider.dart';
 import 'package:weather_app/weather_store.dart';
-
+  
 class WeatherView extends StatefulWidget {
-  WeatherView({this.todaysWeather, this.fiveDayWeatherForecast});
+  const WeatherView({
+    this.todaysWeather,
+    this.fiveDayWeatherForecast,
+  });
   final Map todaysWeather;
   final Map fiveDayWeatherForecast;
 
@@ -55,7 +58,7 @@ class _WeatherViewState extends State<WeatherView> {
                   //mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     const SizedBox(
-                      height: 28,
+                      height: 20,
                     ),
                     Icon(
                       updatedWeather['weatherIcon'],
@@ -81,10 +84,7 @@ class _WeatherViewState extends State<WeatherView> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 45),
                       child: Text(
-                        (updatedWeather['city'] +
-                                ', ' +
-                                updatedWeather['country'])
-                            .toUpperCase(),
+                        '${updatedWeather['city']}, ${updatedWeather['country']}'.toUpperCase(),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         softWrap: false,
@@ -138,7 +138,7 @@ class _WeatherViewState extends State<WeatherView> {
                       ],
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 18),
+                      padding: const EdgeInsets.only(top: 10),
                       child: Text(
                         toBeginningOfSentenceCase(
                             updatedWeather['description']),
@@ -152,21 +152,20 @@ class _WeatherViewState extends State<WeatherView> {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: 20,
-                      width: 250,
-                      child: Divider(
-                        color: Colors.teal.shade100,
+                    Container(
+                      alignment: Alignment.center,
+                      child: SizedBox(
+                        height: 20,
+                        width: 250,
+                        child: Divider(
+                          color: Colors.teal.shade100,
+                        ),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 0),
                       child: Text(
-                        'Low: ' +
-                            updatedWeather['low'].toString() +
-                            '°C |  High: ' +
-                            updatedWeather['high'].toString() +
-                            '°C',
+                        'Low: ${updatedWeather['low']} °C |  High: ${updatedWeather['high']} °C'.toString(),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Lora',
@@ -215,7 +214,7 @@ class _WeatherViewState extends State<WeatherView> {
             (orientation != Orientation.landscape)
                 ? Container(
                     child: Container(
-                      height: 50,
+                      height: 45,
                       margin: const EdgeInsets.only(top: 0),
                       width: double.infinity,
                       color: Colors.white,
@@ -238,7 +237,7 @@ class _WeatherViewState extends State<WeatherView> {
                 ? Expanded(
                     flex: 3,
                     child: Container(
-                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
                       child: ListView(
                         children: <Widget>[
                           Column(
@@ -267,7 +266,7 @@ class _WeatherViewState extends State<WeatherView> {
                           ),
                           Container(
                             alignment: Alignment.center,
-                            margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                            margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                             child: Observer(
                               builder: (_) => RawMaterialButton(
                                 constraints: const BoxConstraints(maxWidth: 40),
