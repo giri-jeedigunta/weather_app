@@ -7,7 +7,7 @@ import 'package:weather_app/components/todays_forecast.dart';
 import 'package:weather_app/components/week_day_forecast.dart';
 import 'package:provider/provider.dart';
 import 'package:weather_app/weather_store.dart';
-  
+
 class WeatherView extends StatefulWidget {
   const WeatherView({
     this.todaysWeather,
@@ -15,6 +15,8 @@ class WeatherView extends StatefulWidget {
   });
   final Map todaysWeather;
   final Map fiveDayWeatherForecast;
+
+  static String routeName = 'WeatherView';
 
   @override
   _WeatherViewState createState() => _WeatherViewState();
@@ -63,10 +65,10 @@ class _WeatherViewState extends State<WeatherView> {
                     Icon(
                       updatedWeather['weatherIcon'],
                       color: Colors.white,
-                      size: 40,
+                      size: 36,
                     ),
                     const SizedBox(
-                      height: 26,
+                      height: 22,
                     ),
                     Text(
                       '$formattedDate - $formattedTime'
@@ -84,14 +86,15 @@ class _WeatherViewState extends State<WeatherView> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 45),
                       child: Text(
-                        '${updatedWeather['city']}, ${updatedWeather['country']}'.toUpperCase(),
+                        '${updatedWeather['city']}, ${updatedWeather['country']}'
+                            .toUpperCase(),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         softWrap: false,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Lora',
-                          fontSize: 28,
+                          fontSize: 26,
                           color: Colors.white,
                           letterSpacing: 1.25,
                           fontWeight: FontWeight.bold,
@@ -116,7 +119,7 @@ class _WeatherViewState extends State<WeatherView> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontFamily: 'Gelasio',
-                              fontSize: 96,
+                              fontSize: 86,
                               color: Colors.white,
                               letterSpacing: 0,
                               fontWeight: FontWeight.w600,
@@ -165,7 +168,8 @@ class _WeatherViewState extends State<WeatherView> {
                     Padding(
                       padding: const EdgeInsets.only(top: 0),
                       child: Text(
-                        'Low: ${updatedWeather['low']} °C |  High: ${updatedWeather['high']} °C'.toString(),
+                        'Low: ${updatedWeather['low']} °C |  High: ${updatedWeather['high']} °C'
+                            .toString(),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Lora',

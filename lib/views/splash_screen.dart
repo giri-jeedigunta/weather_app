@@ -5,6 +5,8 @@ import 'package:weather_app/views/weather.dart';
 import 'package:weather_app/weather_store.dart';
 
 class LoadingView extends StatefulWidget {
+  static String routeName = 'LoadingView';
+
   @override
   _LoadingViewState createState() => _LoadingViewState();
 }
