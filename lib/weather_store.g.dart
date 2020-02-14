@@ -43,10 +43,56 @@ mixin _$WeatherStore on _WeatherStore, Store {
     }, _$longitudeAtom, name: '${_$longitudeAtom.name}_set');
   }
 
-  final _$updateCoordinatesAsyncAction = AsyncAction('updateCoordinates');
+  final _$todaysWeatherAtom = Atom(name: '_WeatherStore.todaysWeather');
 
   @override
-  Future<void> updateCoordinates() {
-    return _$updateCoordinatesAsyncAction.run(() => super.updateCoordinates());
+  Map<dynamic, dynamic> get todaysWeather {
+    _$todaysWeatherAtom.context.enforceReadPolicy(_$todaysWeatherAtom);
+    _$todaysWeatherAtom.reportObserved();
+    return super.todaysWeather;
+  }
+
+  @override
+  set todaysWeather(Map<dynamic, dynamic> value) {
+    _$todaysWeatherAtom.context.conditionallyRunInAction(() {
+      super.todaysWeather = value;
+      _$todaysWeatherAtom.reportChanged();
+    }, _$todaysWeatherAtom, name: '${_$todaysWeatherAtom.name}_set');
+  }
+
+  final _$fiveDayWeatherForecastAtom =
+      Atom(name: '_WeatherStore.fiveDayWeatherForecast');
+
+  @override
+  Map<dynamic, dynamic> get fiveDayWeatherForecast {
+    _$fiveDayWeatherForecastAtom.context
+        .enforceReadPolicy(_$fiveDayWeatherForecastAtom);
+    _$fiveDayWeatherForecastAtom.reportObserved();
+    return super.fiveDayWeatherForecast;
+  }
+
+  @override
+  set fiveDayWeatherForecast(Map<dynamic, dynamic> value) {
+    _$fiveDayWeatherForecastAtom.context.conditionallyRunInAction(() {
+      super.fiveDayWeatherForecast = value;
+      _$fiveDayWeatherForecastAtom.reportChanged();
+    }, _$fiveDayWeatherForecastAtom,
+        name: '${_$fiveDayWeatherForecastAtom.name}_set');
+  }
+
+  final _$updateLocationAsyncAction = AsyncAction('updateLocation');
+
+  @override
+  Future<void> updateLocation() {
+    return _$updateLocationAsyncAction.run(() => super.updateLocation());
+  }
+
+  final _$updateWeatherAndForecastAsyncAction =
+      AsyncAction('updateWeatherAndForecast');
+
+  @override
+  Future<void> updateWeatherAndForecast(double lat, double long) {
+    return _$updateWeatherAndForecastAsyncAction
+        .run(() => super.updateWeatherAndForecast(lat, long));
   }
 }

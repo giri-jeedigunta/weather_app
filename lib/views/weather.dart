@@ -9,13 +9,6 @@ import 'package:provider/provider.dart';
 import 'package:weather_app/weather_store.dart';
 
 class WeatherView extends StatefulWidget {
-  const WeatherView({
-    this.todaysWeather,
-    this.fiveDayWeatherForecast,
-  });
-  final Map todaysWeather;
-  final Map fiveDayWeatherForecast;
-
   static String routeName = 'WeatherView';
 
   @override
@@ -24,29 +17,19 @@ class WeatherView extends StatefulWidget {
 
 class _WeatherViewState extends State<WeatherView> {
   WeatherService weather = WeatherService();
+  WeatherStore weatherStore;
   final String formattedDate = DateFormat.yMMMd().format(DateTime.now());
   final String formattedTime = DateFormat.jm().format(DateTime.now());
-
-  Map updatedWeather, updatedForecast;
 
   @override
   void initState() {
     super.initState();
 
-    updateWeather(widget.todaysWeather, widget.fiveDayWeatherForecast);
-  }
-
-  void updateWeather(dynamic todaysWeather, dynamic fiveDayWeatherForecast) {
-    setState(() {
-      updatedWeather = todaysWeather;
-      updatedForecast = fiveDayWeatherForecast;
-    });
+    weatherStore = Provider.of<WeatherStore>(context, listen: false);
   }
 
   @override
-  Widget build(BuildContext context) {
-    final weatherStore = Provider.of<WeatherStore>(context);
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: const Color(0xff6ABDCB),
       body: OrientationBuilder(
         builder: (context, orientation) => Column(
@@ -57,13 +40,12 @@ class _WeatherViewState extends State<WeatherView> {
               flex: 4,
               child: Container(
                 child: ListView(
-                  //mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     const SizedBox(
                       height: 20,
                     ),
                     Icon(
-                      updatedWeather['weatherIcon'],
+                      weatherStore.todaysWeather['weatherIcon'],
                       color: Colors.white,
                       size: 36,
                     ),
@@ -85,26 +67,28 @@ class _WeatherViewState extends State<WeatherView> {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 45),
-                      child: Text(
-                        '${updatedWeather['city']}, ${updatedWeather['country']}'
-                            .toUpperCase(),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: false,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Lora',
-                          fontSize: 26,
-                          color: Colors.white,
-                          letterSpacing: 1.25,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(
-                                // bottomLeft
-                                offset: const Offset(1.25, 1.25),
-                                color: Colors.black12,
-                                blurRadius: 5),
-                          ],
+                      child: Observer(
+                        builder: (_) => Text(
+                          '${weatherStore.todaysWeather['city']}, ${weatherStore.todaysWeather['country']}'
+                              .toUpperCase(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Lora',
+                            fontSize: 26,
+                            color: Colors.white,
+                            letterSpacing: 1.25,
+                            fontWeight: FontWeight.bold,
+                            shadows: [
+                              Shadow(
+                                  // bottomLeft
+                                  offset: const Offset(1.25, 1.25),
+                                  color: Colors.black12,
+                                  blurRadius: 5),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -114,24 +98,26 @@ class _WeatherViewState extends State<WeatherView> {
                       children: <Widget>[
                         Padding(
                           padding: const EdgeInsets.only(left: 16),
-                          child: Text(
-                            updatedWeather['now'].toString(),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: 'Gelasio',
-                              fontSize: 86,
-                              color: Colors.white,
-                              letterSpacing: 0,
-                              fontWeight: FontWeight.w600,
-                              shadows: [
-                                Shadow(
-                                    // bottomLeft
-                                    offset: const Offset(1.25, 1.25),
-                                    color: Colors.black26,
-                                    blurRadius: 5),
-                              ],
-                            ),
-                          ),
+                          child: Observer(
+                              builder: (_) => Text(
+                                    weatherStore.todaysWeather['now']
+                                        .toString(),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: 'Gelasio',
+                                      fontSize: 86,
+                                      color: Colors.white,
+                                      letterSpacing: 0,
+                                      fontWeight: FontWeight.w600,
+                                      shadows: [
+                                        Shadow(
+                                            // bottomLeft
+                                            offset: const Offset(1.25, 1.25),
+                                            color: Colors.black26,
+                                            blurRadius: 5),
+                                      ],
+                                    ),
+                                  )),
                         ),
                         Icon(
                           WeatherIcons.celsius,
@@ -142,18 +128,19 @@ class _WeatherViewState extends State<WeatherView> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
-                      child: Text(
-                        toBeginningOfSentenceCase(
-                            updatedWeather['description']),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Lora',
-                          fontSize: 14,
-                          color: Colors.white,
-                          letterSpacing: 1.25,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child: Observer(
+                          builder: (_) => Text(
+                                toBeginningOfSentenceCase(
+                                    weatherStore.todaysWeather['description']),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: 'Lora',
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                  letterSpacing: 1.25,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )),
                     ),
                     Container(
                       alignment: Alignment.center,
@@ -167,46 +154,57 @@ class _WeatherViewState extends State<WeatherView> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 0),
-                      child: Text(
-                        'Low: ${updatedWeather['low']} °C |  High: ${updatedWeather['high']} °C'
-                            .toString(),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Lora',
-                          fontSize: 12,
-                          color: Colors.white,
-                          letterSpacing: 1.35,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child: Observer(
+                          builder: (_) => Text(
+                                'Low: ${weatherStore.todaysWeather['low']} °C |  High: ${weatherStore.todaysWeather['high']} °C'
+                                    .toString(),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: 'Lora',
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                  letterSpacing: 1.35,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )),
                     ),
                     const SizedBox(
                       height: 30,
                     ),
                     Padding(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          updatedForecast['todaysForecast']['timeSlots'].length,
-                          (index) => index < 7
-                              ? TodaysForecast(
-                                  timeStamp: updatedForecast['todaysForecast']
-                                      ['timeSlots'][index],
-                                  temprature: (updatedForecast['weeklyForecast']
-                                          ['tempraturesList'][0][index])
-                                      .toInt(),
-                                  endOfList: index > 5 ||
-                                          index ==
-                                              updatedForecast['todaysForecast']
-                                                          ['timeSlots']
-                                                      .length -
-                                                  1
-                                      ? const Color(0xff6ABDCB)
-                                      : Colors.white24,
-                                )
-                              : const SizedBox(width: 0, height: 0),
-                        ),
-                      ),
+                      child: Observer(
+                          builder: (_) => Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List.generate(
+                                  weatherStore
+                                      .fiveDayWeatherForecast['todaysForecast']
+                                          ['timeSlots']
+                                      .length,
+                                  (index) => index < 7
+                                      ? TodaysForecast(
+                                          timeStamp: weatherStore
+                                                      .fiveDayWeatherForecast[
+                                                  'todaysForecast']['timeSlots']
+                                              [index],
+                                          temprature: (weatherStore
+                                                          .fiveDayWeatherForecast[
+                                                      'weeklyForecast']
+                                                  ['tempraturesList'][0][index])
+                                              .toInt(),
+                                          endOfList: index > 5 ||
+                                                  index ==
+                                                      weatherStore
+                                                              .fiveDayWeatherForecast[
+                                                                  'todaysForecast']
+                                                                  ['timeSlots']
+                                                              .length -
+                                                          1
+                                              ? const Color(0xff6ABDCB)
+                                              : Colors.white24,
+                                        )
+                                      : const SizedBox(width: 0, height: 0),
+                                ),
+                              )),
                       padding: const EdgeInsets.all(0),
                     ),
                   ],
@@ -240,78 +238,82 @@ class _WeatherViewState extends State<WeatherView> {
             (orientation != Orientation.landscape)
                 ? Expanded(
                     flex: 3,
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                      child: ListView(
-                        children: <Widget>[
-                          Column(
-                            children: List.generate(
-                              updatedForecast['weeklyForecast']['dateList']
-                                  .length,
-                              (index) => index != 0
-                                  ? WeekDayForecast(
-                                      weekDayName: DateFormat('EEEE').format(
-                                          DateTime.parse(
-                                              updatedForecast['weeklyForecast']
-                                                      ['dateList'][index]
-                                                  .toString())),
-                                      weekTempratureDayLowHigh:
-                                          updatedForecast['weeklyForecast']
-                                              ['tempraturesList'][index]
-                                            ..sort(),
-                                      weatherConditionIcon:
-                                          weather.getWeatherIcon(
-                                              updatedForecast['weeklyForecast']
-                                                  ['conditionList'][index]),
-                                      weekDayCount: index.toInt(),
-                                    )
-                                  : const SizedBox(width: 0, height: 0),
-                            ),
-                          ),
-                          Container(
-                            alignment: Alignment.center,
-                            margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                            child: Observer(
-                              builder: (_) => RawMaterialButton(
-                                constraints: const BoxConstraints(maxWidth: 40),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(40),
-                                  side: BorderSide(color: Colors.black38),
-                                ),
-                                padding: const EdgeInsets.all(5),
-                                onPressed: () async {
-                                  await weatherStore.updateCoordinates();
-
-                                  final todaysWeather =
-                                      await weather.getLocationWeather(
-                                          weatherStore.latitude,
-                                          weatherStore.longitude);
-                                  final fiveDayWeatherForecast =
-                                      await weather.getFiveDayForecast(
-                                          weatherStore.latitude,
-                                          weatherStore.longitude);
-
-                                  updateWeather(
-                                      todaysWeather, fiveDayWeatherForecast);
-                                },
-                                child: Icon(
-                                  Icons.refresh,
-                                  color: Colors.black87,
-                                  size: 24,
+                    child: Observer(
+                        builder: (_) => Container(
+                              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                              child: ListView(
+                                children: <Widget>[
+                                  Column(
+                                    children: List.generate(
+                                      weatherStore
+                                          .fiveDayWeatherForecast[
+                                              'weeklyForecast']['dateList']
+                                          .length,
+                                      (index) => index != 0
+                                          ? WeekDayForecast(
+                                              weekDayName: DateFormat('EEEE')
+                                                  .format(DateTime.parse(
+                                                      weatherStore
+                                                          .fiveDayWeatherForecast[
+                                                              'weeklyForecast']
+                                                              ['dateList']
+                                                              [index]
+                                                          .toString())),
+                                              weekTempratureDayLowHigh:
+                                                  weatherStore.fiveDayWeatherForecast[
+                                                          'weeklyForecast']
+                                                      ['tempraturesList'][index]
+                                                    ..sort(),
+                                              weatherConditionIcon: weather
+                                                  .getWeatherIcon(weatherStore
+                                                              .fiveDayWeatherForecast[
+                                                          'weeklyForecast']
+                                                      ['conditionList'][index]),
+                                              weekDayCount: index.toInt(),
+                                            )
+                                          : const SizedBox(width: 0, height: 0),
+                                    ),
+                                  ),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    margin:
+                                        const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    child: Observer(
+                                      builder: (_) => RawMaterialButton(
+                                        constraints:
+                                            const BoxConstraints(maxWidth: 40),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(40),
+                                          side:
+                                              BorderSide(color: Colors.black38),
+                                        ),
+                                        padding: const EdgeInsets.all(5),
+                                        onPressed: () async {
+                                          await weatherStore.updateLocation();
+                                          await weatherStore
+                                              .updateWeatherAndForecast(
+                                                  weatherStore.latitude,
+                                                  weatherStore.longitude);
+                                        },
+                                        child: Icon(
+                                          Icons.refresh,
+                                          color: Colors.black87,
+                                          size: 24,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: const BorderRadius.only(
+                                  topRight: Radius.circular(45),
                                 ),
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(45),
-                        ),
-                      ),
-                    ),
+                            )),
                   )
                 : const SizedBox(
                     height: 1,
@@ -320,5 +322,4 @@ class _WeatherViewState extends State<WeatherView> {
         ),
       ),
     );
-  }
 }

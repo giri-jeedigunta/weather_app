@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:weather_app/services/weather_helper.dart';
 import 'package:weather_app/views/weather.dart';
 import 'package:weather_app/weather_store.dart';
 
@@ -12,25 +11,17 @@ class LoadingView extends StatefulWidget {
 }
 
 class _LoadingViewState extends State<LoadingView> {
-  WeatherService weather = WeatherService();
   WeatherStore weatherStore;
 
   // ignore: avoid_void_async
   void getWeather() async {
-    await weatherStore.updateCoordinates();
-
-    final todaysWeather = await weather.getLocationWeather(
-        weatherStore.latitude, weatherStore.longitude);
-    final fiveDayWeatherForecast = await weather.getFiveDayForecast(
+    await weatherStore.updateLocation();
+    await weatherStore.updateWeatherAndForecast(
         weatherStore.latitude, weatherStore.longitude);
 
-    await Navigator.push(
+    await Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-          builder: (context) => WeatherView(
-                todaysWeather: todaysWeather,
-                fiveDayWeatherForecast: fiveDayWeatherForecast,
-              )),
+      WeatherView.routeName
     );
   }
 
@@ -46,10 +37,11 @@ class _LoadingViewState extends State<LoadingView> {
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[Image.asset('assets/images/loader.gif')],
-        )),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[Image.asset('assets/images/loader.gif')],
+          ),
+        ),
       );
 }
