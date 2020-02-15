@@ -88,7 +88,7 @@ class _WeatherViewState extends State<WeatherView> {
                         child: Observer(
                           builder: (_) => Container(
                             child: TextFormField(
-                              initialValue: cityAndCountry,
+                              initialValue: cityAndCountry.toUpperCase(),
                               readOnly: true,
                               textAlign: TextAlign.center,
                               onTap: () {

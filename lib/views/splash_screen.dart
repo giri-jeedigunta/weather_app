@@ -19,10 +19,7 @@ class _LoadingViewState extends State<LoadingView> {
     await weatherStore.updateWeatherAndForecast(
         weatherStore.latitude, weatherStore.longitude);
 
-    await Navigator.pushNamed(
-      context,
-      WeatherView.routeName
-    );
+    await Navigator.pushNamed(context, WeatherView.routeName);
   }
 
   @override
