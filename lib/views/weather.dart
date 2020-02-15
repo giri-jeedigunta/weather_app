@@ -22,11 +22,28 @@ class _WeatherViewState extends State<WeatherView> {
   final String formattedDate = DateFormat.yMMMd().format(DateTime.now());
   final String formattedTime = DateFormat.jm().format(DateTime.now());
 
+  String cityAndCountry = '';
+
   @override
   void initState() {
     super.initState();
 
     weatherStore = Provider.of<WeatherStore>(context, listen: false);
+    addEllipses(
+      weatherStore.todaysWeather['city'].toString(),
+      weatherStore.todaysWeather['country'].toString(),
+    );
+  }
+
+  void addEllipses(String city, String country) {
+    if (city.length < 16) {
+      cityAndCountry = '$city, $country';
+    } else if (city.length > 15 && city.length <= 19) {
+      cityAndCountry = '$city';
+    } else if (city.length > 19) {
+      cityAndCountry = '${city.substring(0, 15)}...';
+    }
+    //cityAndCountry
   }
 
   @override
@@ -69,34 +86,33 @@ class _WeatherViewState extends State<WeatherView> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 45),
                         child: Observer(
-                          builder: (_) => FlatButton(
-                            onPressed: () {
-                              Navigator.pushNamed(
-                                  context, CitySearch.routeName);
-                            },
-                            child: Hero(
-                              tag: 'city',
-                              child: Text(
-                                '${weatherStore.todaysWeather['city']}, ${weatherStore.todaysWeather['country']}'
-                                    .toUpperCase(),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                softWrap: false,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: 'Lora',
-                                  fontSize: 26,
-                                  color: Colors.white,
-                                  letterSpacing: 1.25,
-                                  fontWeight: FontWeight.bold,
-                                  shadows: [
-                                    Shadow(
-                                        // bottomLeft
-                                        offset: const Offset(1.25, 1.25),
-                                        color: Colors.black12,
-                                        blurRadius: 5),
-                                  ],
-                                ),
+                          builder: (_) => Container(
+                            child: TextFormField(
+                              initialValue: cityAndCountry,
+                              readOnly: true,
+                              textAlign: TextAlign.center,
+                              onTap: () {
+                                Navigator.pushNamed(
+                                    context, CitySearch.routeName);
+                              },
+                              style: TextStyle(
+                                fontFamily: 'Lora',
+                                fontSize: 24,
+                                color: Colors.white,
+                                letterSpacing: 1.25,
+                                fontWeight: FontWeight.bold,
+                                shadows: [
+                                  Shadow(
+                                      // bottomLeft
+                                      offset: const Offset(1.25, 1.25),
+                                      color: Colors.black12,
+                                      blurRadius: 5),
+                                ],
+                              ),
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                hintText: null,
+                                labelText: null,
                               ),
                             ),
                           ),
