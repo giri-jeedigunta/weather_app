@@ -5,7 +5,7 @@ Weather App built on Flutter & Mobx.
 ## App in action
 
 ### Splash Screen
-![Weather app splash screen](https://thewebstorebyg.files.wordpress.com/2020/02/splash.png)
+![Weather app splash screen](https://thewebstorebyg.files.wordpress.com/2020/02/ezgif.com-resize.gif)
 
 ### Main Weather Screen
 ![Weather app main screen](https://thewebstorebyg.files.wordpress.com/2020/02/weather-1.jpg)
