@@ -17,7 +17,7 @@ class WeatherApp extends StatelessWidget {
             initialRoute: LoadingView.routeName,
             routes: {
               LoadingView.routeName: (context) => LoadingView(),
-              WeatherView.routeName: (context) => WeatherView(), 
+              WeatherView.routeName: (context) => WeatherView(),
               CitySearch.routeName: (context) => CitySearch()
             },
           ),
